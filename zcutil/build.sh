@@ -1,6 +1,25 @@
 #!/bin/bash
-set -exu -o pipefail
 
+set -eu -o pipefail
+
+if [ "x$*" = 'x--help' ]
+then
+    cat <<EOF
+Usage:
+
+$0 --help
+  Show this help message and exit.
+
+$0 [ --enable-lcov ] [ MAKEARGS... ]
+  Build Zcash and most of its transitive dependencies from
+  source. MAKEARGS are applied to both dependencies and Zcash itself. If
+  --enable-lcov is passed, Zcash is configured to add coverage
+  instrumentation, thus enabling "make cov" to work.
+EOF
+    exit 0
+fi
+
+set -x
 cd "$(dirname "$(readlink -f "$0")")/.."
 
 # If --enable-lcov is the first argument, enable lcov coverage support:
