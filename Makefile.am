@@ -145,56 +145,119 @@ $(BITCOIN_CLI_BIN): FORCE
 if USE_LCOV
 
 baseline.info:
-	$(LCOV) -c -i -d $(abs_builddir)/src -o $@
+	$(LCOV) \
+		-c \
+		-i \
+		-d $(abs_builddir)/src \
+		-o $@
 
 baseline_filtered.info: baseline.info
-	$(LCOV) -r $< "/usr/include/*" -o $@
+	$(LCOV) \
+		-r $< "/usr/include/*" \
+		-o $@
 
 leveldb_baseline.info: baseline_filtered.info
-	$(LCOV) -c -i -d $(abs_builddir)/src/leveldb -b $(abs_builddir)/src/leveldb -o $@
+	$(LCOV) \
+		-c \
+		-i \
+		-d $(abs_builddir)/src/leveldb \
+		-b $(abs_builddir)/src/leveldb \
+		-o $@
 
 leveldb_baseline_filtered.info: leveldb_baseline.info
-	$(LCOV) -r $< "/usr/include/*" -o $@
+	$(LCOV) \
+		-r $< "/usr/include/*" \
+		-o $@
 
 baseline_filtered_combined.info: leveldb_baseline_filtered.info baseline_filtered.info
-	$(LCOV) -a leveldb_baseline_filtered.info -a baseline_filtered.info -o $@
+	$(LCOV) \
+		-a leveldb_baseline_filtered.info \
+		-a baseline_filtered.info \
+		-o $@
 
 test_bitcoin.info: baseline_filtered_combined.info
 	$(MAKE) -C src/ bitcoin_test_check
-	$(LCOV) -c -d $(abs_builddir)/src -t test_bitcoin -o $@
-	$(LCOV) -z -d $(abs_builddir)/src
-	$(LCOV) -z -d $(abs_builddir)/src/leveldb
+	$(LCOV) \
+		-c \
+		-d $(abs_builddir)/src \
+		-t test_bitcoin \
+		-o $@
+	$(LCOV) \
+		-z \
+		-d $(abs_builddir)/src
+	$(LCOV) \
+		-z \
+		-d $(abs_builddir)/src/leveldb
 
 test_bitcoin_filtered.info: test_bitcoin.info
-	$(LCOV) -r $< "/usr/include/*" -o $@
+	$(LCOV) \
+		-r $< "/usr/include/*" \
+		-o $@
 
 zcash-gtest.info: baseline_filtered.info
 	$(MAKE) -C src/ zcash-gtest_check
-	$(LCOV) -c -d $(abs_builddir)/src -t zcash-gtest -o $@
-	$(LCOV) -z -d $(abs_builddir)/src
-	$(LCOV) -z -d $(abs_builddir)/src/leveldb
+	$(LCOV) \
+		-c \
+		-d $(abs_builddir)/src \
+		-t zcash-gtest \
+		-o $@
+	$(LCOV) \
+		-z \
+		-d $(abs_builddir)/src
+	$(LCOV) \
+		-z \
+		-d $(abs_builddir)/src/leveldb
 
 zcash-gtest_filtered.info: zcash-gtest.info
-	$(LCOV) -r $< "/usr/include/*" -o $@
+	$(LCOV) \
+		-r $< "/usr/include/*" \
+		-o $@
 
 block_test.info: test_bitcoin_filtered.info
 	$(MKDIR_P) qa/tmp
 	-@TIMEOUT=15 qa/pull-tester/run-bitcoind-for-test.sh $(JAVA) -jar $(JAVA_COMPARISON_TOOL) qa/tmp/compTool 0
-	$(LCOV) -c -d $(abs_builddir)/src --t BitcoinJBlockTest -o $@
-	$(LCOV) -z -d $(abs_builddir)/src
-	$(LCOV) -z -d $(abs_builddir)/src/leveldb
+	$(LCOV) \
+		-c \
+		-d $(abs_builddir)/src \
+		-t BitcoinJBlockTest \
+		-o $@
+	$(LCOV) \
+		-z \
+		-d $(abs_builddir)/src
+	$(LCOV) \
+		-z \
+		-d $(abs_builddir)/src/leveldb
 
 block_test_filtered.info: block_test.info
-	$(LCOV) -r $< "/usr/include/*" -o $@
+	$(LCOV) \
+		-r $< "/usr/include/*" \
+		-o $@
 
 test_bitcoin_coverage.info: baseline_filtered_combined.info test_bitcoin_filtered.info
-	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a test_bitcoin_filtered.info -o $@
+	$(LCOV) \
+		-a baseline_filtered.info \
+		-a leveldb_baseline_filtered.info \
+		-a test_bitcoin_filtered.info \
+		-o $@
 
 zcash-gtest_coverage.info: baseline_filtered_combined.info zcash-gtest_filtered.info
-	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a zcash-gtest_filtered.info -o $@
+	$(LCOV) \
+		-a baseline_filtered.info \
+		-a leveldb_baseline_filtered.info \
+		-a zcash-gtest_filtered.info \
+		-o $@
 
 total_coverage.info:  baseline_filtered_combined.info test_bitcoin_filtered.info zcash-gtest_filtered.info block_test_filtered.info
-	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a test_bitcoin_filtered.info -a zcash-gtest_filtered.info -a block_test_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
+	$(LCOV) \
+		-a baseline_filtered.info \
+		-a leveldb_baseline_filtered.info \
+		-a test_bitcoin_filtered.info \
+		-a zcash-gtest_filtered.info \
+		-a block_test_filtered.info \
+		-o $@ \
+		| $(GREP) "\%" \
+		| $(AWK) '{ print substr($$3,2,50) "/" $$5 }' \
+		> coverage_percent.txt
 
 test_bitcoin.coverage/.dirstamp:  test_bitcoin_coverage.info
 	$(GENHTML) -s $< -o $(@D)
