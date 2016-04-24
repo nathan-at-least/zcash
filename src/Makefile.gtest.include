@@ -3,11 +3,27 @@ bin_PROGRAMS += zcash-gtest
 # tool for generating our public parameters
 zcash_gtest_SOURCES = \
 	gtest/main.cpp \
+	gtest/test_CheckTransaction.cpp \
 	gtest/test_tautology.cpp
 
 zcash_gtest_LDADD = \
   -lgtest \
-  $(LIBBITCOIN_UTIL)
+  $(LIBBITCOIN_SERVER) \
+  $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_CRYPTO) \
+  $(LIBBITCOIN_UNIVALUE) \
+  $(LIBLEVELDB) \
+  $(LIBMEMENV) \
+  $(BDB_LIBS) \
+  $(MINIUPNPC_LIBS) \
+  $(BOOST_LIBS) \
+  $(CRYPTO_LIBS) \
+  $(LIBSECP256K1) \
+  $(SSL_LIBS) \
+  $(LIBZEROCASH) \
+  $(LIBZEROCASH_LIBS)
 
 zcash-gtest_check: zcash-gtest FORCE
 	./zcash-gtest
