@@ -168,7 +168,7 @@ test_bitcoin.info: baseline_filtered_combined.info
 test_bitcoin_filtered.info: test_bitcoin.info
 	$(LCOV) -r $< "/usr/include/*" -o $@
 
-zcash-gtest.info: baseline_filtered_combined.info
+zcash-gtest.info: baseline_filtered.info
 	$(MAKE) -C src/ zcash-gtest_check
 	$(LCOV) -c -d $(abs_builddir)/src -t test_bitcoin -o $@
 	$(LCOV) -z -d $(abs_builddir)/src
