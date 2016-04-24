@@ -154,6 +154,7 @@ baseline.info:
 baseline_filtered.info: baseline.info
 	$(LCOV) \
 		--remove $< "/usr/include/*" \
+		--remove $< "depends/*" \
 		--output-file $@
 
 leveldb_baseline.info: baseline_filtered.info
@@ -167,6 +168,7 @@ leveldb_baseline.info: baseline_filtered.info
 leveldb_baseline_filtered.info: leveldb_baseline.info
 	$(LCOV) \
 		--remove $< "/usr/include/*" \
+		--remove $< "depends/*" \
 		--output-file $@
 
 baseline_filtered_combined.info: leveldb_baseline_filtered.info baseline_filtered.info
@@ -192,6 +194,7 @@ test_bitcoin.info: baseline_filtered_combined.info
 test_bitcoin_filtered.info: test_bitcoin.info
 	$(LCOV) \
 		--remove $< "/usr/include/*" \
+		--remove $< "depends/*" \
 		--output-file $@
 
 zcash-gtest.info: baseline_filtered.info
@@ -211,6 +214,7 @@ zcash-gtest.info: baseline_filtered.info
 zcash-gtest_filtered.info: zcash-gtest.info
 	$(LCOV) \
 		--remove $< "/usr/include/*" \
+		--remove $< "depends/*" \
 		--output-file $@
 
 block_test.info: test_bitcoin_filtered.info
@@ -231,6 +235,7 @@ block_test.info: test_bitcoin_filtered.info
 block_test_filtered.info: block_test.info
 	$(LCOV) \
 		--remove $< "/usr/include/*" \
+		--remove $< "depends/*" \
 		--output-file $@
 
 test_bitcoin_coverage.info: baseline_filtered_combined.info test_bitcoin_filtered.info
