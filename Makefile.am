@@ -146,115 +146,115 @@ if USE_LCOV
 
 baseline.info:
 	$(LCOV) \
-		-c \
-		-i \
-		-d $(abs_builddir)/src \
-		-o $@
+		--capture \
+		--initial \
+		--directory $(abs_builddir)/src \
+		--output-file $@
 
 baseline_filtered.info: baseline.info
 	$(LCOV) \
-		-r $< "/usr/include/*" \
-		-o $@
+		--remove $< "/usr/include/*" \
+		--output-file $@
 
 leveldb_baseline.info: baseline_filtered.info
 	$(LCOV) \
-		-c \
-		-i \
-		-d $(abs_builddir)/src/leveldb \
-		-b $(abs_builddir)/src/leveldb \
-		-o $@
+		--capture \
+		--initial \
+		--directory $(abs_builddir)/src/leveldb \
+		--base-directory $(abs_builddir)/src/leveldb \
+		--output-file $@
 
 leveldb_baseline_filtered.info: leveldb_baseline.info
 	$(LCOV) \
-		-r $< "/usr/include/*" \
-		-o $@
+		--remove $< "/usr/include/*" \
+		--output-file $@
 
 baseline_filtered_combined.info: leveldb_baseline_filtered.info baseline_filtered.info
 	$(LCOV) \
-		-a leveldb_baseline_filtered.info \
-		-a baseline_filtered.info \
-		-o $@
+		--add-tracefile leveldb_baseline_filtered.info \
+		--add-tracefile baseline_filtered.info \
+		--output-file $@
 
 test_bitcoin.info: baseline_filtered_combined.info
 	$(MAKE) -C src/ bitcoin_test_check
 	$(LCOV) \
-		-c \
-		-d $(abs_builddir)/src \
-		-t test_bitcoin \
-		-o $@
+		--capture \
+		--directory $(abs_builddir)/src \
+		--test-name test_bitcoin \
+		--output-file $@
 	$(LCOV) \
-		-z \
-		-d $(abs_builddir)/src
+		--zerocounters \
+		--directory $(abs_builddir)/src
 	$(LCOV) \
-		-z \
-		-d $(abs_builddir)/src/leveldb
+		--zerocounters \
+		--directory $(abs_builddir)/src/leveldb
 
 test_bitcoin_filtered.info: test_bitcoin.info
 	$(LCOV) \
-		-r $< "/usr/include/*" \
-		-o $@
+		--remove $< "/usr/include/*" \
+		--output-file $@
 
 zcash-gtest.info: baseline_filtered.info
 	$(MAKE) -C src/ zcash-gtest_check
 	$(LCOV) \
-		-c \
-		-d $(abs_builddir)/src \
-		-t zcash-gtest \
-		-o $@
+		--capture \
+		--directory $(abs_builddir)/src \
+		--test-name zcash-gtest \
+		--output-file $@
 	$(LCOV) \
-		-z \
-		-d $(abs_builddir)/src
+		--zerocounters \
+		--directory $(abs_builddir)/src
 	$(LCOV) \
-		-z \
-		-d $(abs_builddir)/src/leveldb
+		--zerocounters \
+		--directory $(abs_builddir)/src/leveldb
 
 zcash-gtest_filtered.info: zcash-gtest.info
 	$(LCOV) \
-		-r $< "/usr/include/*" \
-		-o $@
+		--remove $< "/usr/include/*" \
+		--output-file $@
 
 block_test.info: test_bitcoin_filtered.info
 	$(MKDIR_P) qa/tmp
 	-@TIMEOUT=15 qa/pull-tester/run-bitcoind-for-test.sh $(JAVA) -jar $(JAVA_COMPARISON_TOOL) qa/tmp/compTool 0
 	$(LCOV) \
-		-c \
-		-d $(abs_builddir)/src \
-		-t BitcoinJBlockTest \
-		-o $@
+		--capture \
+		--directory $(abs_builddir)/src \
+		--test-name BitcoinJBlockTest \
+		--output-file $@
 	$(LCOV) \
-		-z \
-		-d $(abs_builddir)/src
+		--zerocounters \
+		--directory $(abs_builddir)/src
 	$(LCOV) \
-		-z \
-		-d $(abs_builddir)/src/leveldb
+		--zerocounters \
+		--directory $(abs_builddir)/src/leveldb
 
 block_test_filtered.info: block_test.info
 	$(LCOV) \
-		-r $< "/usr/include/*" \
-		-o $@
+		--remove $< "/usr/include/*" \
+		--output-file $@
 
 test_bitcoin_coverage.info: baseline_filtered_combined.info test_bitcoin_filtered.info
 	$(LCOV) \
-		-a baseline_filtered.info \
-		-a leveldb_baseline_filtered.info \
-		-a test_bitcoin_filtered.info \
-		-o $@
+		--add-tracefile baseline_filtered.info \
+		--add-tracefile leveldb_baseline_filtered.info \
+		--add-tracefile test_bitcoin_filtered.info \
+		--output-file $@
 
 zcash-gtest_coverage.info: baseline_filtered_combined.info zcash-gtest_filtered.info
 	$(LCOV) \
-		-a baseline_filtered.info \
-		-a leveldb_baseline_filtered.info \
-		-a zcash-gtest_filtered.info \
-		-o $@
+		--add-tracefile baseline_filtered.info \
+		--add-tracefile leveldb_baseline_filtered.info \
+		--add-tracefile zcash-gtest_filtered.info \
+		--output-file $@
 
 total_coverage.info:  baseline_filtered_combined.info test_bitcoin_filtered.info zcash-gtest_filtered.info block_test_filtered.info
 	$(LCOV) \
-		-a baseline_filtered.info \
-		-a leveldb_baseline_filtered.info \
-		-a test_bitcoin_filtered.info \
-		-a zcash-gtest_filtered.info \
-		-a block_test_filtered.info \
-		-o $@ \
+		--add-tracefile baseline_filtered.info \
+		--add-tracefile leveldb_baseline_filtered.info \
+		--add-tracefile test_bitcoin_filtered.info \
+		--add-tracefile zcash-gtest_filtered.info \
+		--add-tracefile block_test_filtered.info \
+		--output-file $@ \
 		| $(GREP) "\%" \
 		| $(AWK) '{ print substr($$3,2,50) "/" $$5 }' \
 		> coverage_percent.txt
