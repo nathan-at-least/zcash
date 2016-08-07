@@ -21,11 +21,18 @@ endef
 
 define fetch_file
 (test -f $$($(1)_source_dir)/$(4) || \
+  (test -f "$(HOME)/.zcash-depends-cache/$(5)_$(1)" && \
+	echo "... using locally cached source:" && \
+	cp -v "$(HOME)/.zcash-depends-cache/$(5)_$(1)" "$$($(1)_source_dir)/$(4)" ) || \
   ( mkdir -p $$($(1)_download_dir) && echo Fetching $(1)... && \
   ( $(build_DOWNLOAD) "$$($(1)_download_dir)/$(4).temp" "$(FALLBACK_DOWNLOAD_PATH)/$(4)" || \
     $(build_DOWNLOAD) "$$($(1)_download_dir)/$(4).temp" "$(2)/$(3)" ) && \
     echo "$(5)  $$($(1)_download_dir)/$(4).temp" > $$($(1)_download_dir)/.$(4).hash && \
     $(build_SHA256SUM) -c $$($(1)_download_dir)/.$(4).hash && \
+	( test -d "$(HOME)/.zcash-depends-cache" || \
+	  mkdir "$(HOME)/.zcash-depends-cache" && \
+      cp $$($(1)_download_dir)/$(4).temp "$(HOME)/.zcash-depends-cache/$(5)_$(1)" \
+    ) && \
     mv $$($(1)_download_dir)/$(4).temp $$($(1)_source_dir)/$(4) && \
     rm -rf $$($(1)_download_dir) ))
 endef
