@@ -1384,22 +1384,54 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
     return nSubsidy;
 }
 
-bool IsInitialBlockDownload()
+bool _IsInitialBlockDownload()
 {
     const CChainParams& chainParams = Params();
     LOCK(cs_main);
+    LogPrint("pow", "IsInitialBlockDownload: %s = fImporting %s || fReindex %s\n",
+             fImporting || fReindex, fImporting, fReindex);
     if (fImporting || fReindex)
         return true;
+    LogPrint("pow",
+             ("IsInitialBlockDownload: %s = fCheckpointsEnabled %s && "
+              "chainActive.Height() %s < "
+              "Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()) %s\n"),
+             (fCheckpointsEnabled && chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints())),
+             fCheckpointsEnabled,
+             chainActive.Height(),
+             Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints())
+             );
     if (fCheckpointsEnabled && chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
         return true;
     static bool lockIBDState = false;
+    LogPrint("pow", "IsInitialBlockDownload: %s = !lockIBDState %s\n",
+             !lockIBDState, lockIBDState);
     if (lockIBDState)
         return false;
     bool state = (chainActive.Height() < pindexBestHeader->nHeight - 24 * 6 ||
             pindexBestHeader->GetBlockTime() < GetTime() - chainParams.MaxTipAge());
+    LogPrint("pow",
+             ("IsInitialBlockDownload: %s = ",
+              "(chainActive.Height() %s < pindexBestHeader->nHeight %s - 24 * 6 "
+              " || pindexBestHeader->GetBlockTime() %s "
+              " < GetTime() - chainParams.MaxTipAge() %s)\n"),
+             (chainActive.Height() < pindexBestHeader->nHeight - 24 * 6 ||
+              pindexBestHeader->GetBlockTime() < GetTime() - chainParams.MaxTipAge()),
+             chainActive.Height(),
+             pindexBestHeader->nHeight,
+             pindexBestHeader->GetBlockTime(),
+             GetTime() - chainParams.MaxTipAge()
+             );
     if (!state)
         lockIBDState = true;
     return state;
+}
+
+bool IsInitialBlockDownload()
+{
+    bool result = _IsInitialBlockDownload();
+    LogPrint("pow", "IsInitialBlockDownload? %s", result);
+    return result;
 }
 
 bool fLargeWorkForkFound = false;
@@ -3709,25 +3741,34 @@ bool InitBlockIndex() {
     LogPrintf("Initializing databases...\n");
 
     // Only add the genesis block if not reindexing (in which case we reuse the one already on disk)
+    LogPrint("pow", "!fReindex == %s\n", !fReindex);
     if (!fReindex) {
+        LogPrint("pow", "inside try\n");
         try {
             CBlock &block = const_cast<CBlock&>(Params().GenesisBlock());
             // Start new block file
             unsigned int nBlockSize = ::GetSerializeSize(block, SER_DISK, CLIENT_VERSION);
             CDiskBlockPos blockPos;
             CValidationState state;
+            LogPrint("pow", "FindBlockPos...\n");
             if (!FindBlockPos(state, blockPos, nBlockSize+8, 0, block.GetBlockTime()))
                 return error("LoadBlockIndex(): FindBlockPos failed");
+            LogPrint("pow", "WriteBlockToDisk...\n");
             if (!WriteBlockToDisk(block, blockPos, chainparams.MessageStart()))
                 return error("LoadBlockIndex(): writing genesis block to disk failed");
+            LogPrint("pow", "AddToBlockIndex...\n");
             CBlockIndex *pindex = AddToBlockIndex(block);
+            LogPrint("pow", "ReceivedBlockTransactions...\n");
             if (!ReceivedBlockTransactions(block, state, pindex, blockPos))
                 return error("LoadBlockIndex(): genesis block not accepted");
+            LogPrint("pow", "ActivateBestChain...\n");
             if (!ActivateBestChain(state, &block))
                 return error("LoadBlockIndex(): genesis block cannot be activated");
             // Force a chainstate write so that when we VerifyDB in a moment, it doesn't check stale data
+            LogPrint("pow", "FlushStatetoDisk...\n");
             return FlushStateToDisk(state, FLUSH_STATE_ALWAYS);
         } catch (const std::runtime_error& e) {
+            LogPrint("pow", "XXXXXXXXXXXXXXXXXXXXX type: %s\n", typeid(e).name());
             return error("LoadBlockIndex(): failed to initialize block database: %s", e.what());
         }
     }

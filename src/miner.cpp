@@ -473,7 +473,10 @@ void static BitcoinMiner(CWallet *pwallet)
                         LOCK(cs_vNodes);
                         fvNodesEmpty = vNodes.empty();
                     }
-                    if (!fvNodesEmpty && !IsInitialBlockDownload())
+                    auto isinitial = IsInitialBlockDownload();
+                    LogPrint("pow", "fvNodesEmpty %s; IsInitialBlockDownload() %s\n",
+                             fvNodesEmpty, isinitial);
+                    if (!fvNodesEmpty && !isinitial)
                         break;
                     MilliSleep(1000);
                 } while (true);
