@@ -101,6 +101,12 @@
 #ifndef TINYFORMAT_H_INCLUDED
 #define TINYFORMAT_H_INCLUDED
 
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
 namespace tinyformat {}
 //------------------------------------------------------------------------------
 // Config section.  Customize to your liking!
@@ -673,6 +679,16 @@ inline const char* FormatIterator::streamStateFromFormat(std::ostream& out,
 {
     if(*fmtStart != '%')
     {
+        {
+            int nptrs;
+            void *buffer[128];
+            char **strings;
+
+            printf("============== HAPPy? BACKTRACE\n");
+            nptrs = backtrace(buffer, 128);
+            printf("backtrace() returned %d addresses\n", nptrs);
+            backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO);
+        }
         TINYFORMAT_ERROR("tinyformat: Not enough conversion specifiers in format string");
         return fmtStart;
     }
