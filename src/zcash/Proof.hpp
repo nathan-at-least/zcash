@@ -269,7 +269,7 @@ public:
         const ProcessedVerificationKey& pvk,
         const PrimaryInput& pi,
         const Proof& p
-    );
+    ) const;
 };
 
 }

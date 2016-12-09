@@ -236,6 +236,7 @@ bool ProofVerifier::check(
     const r1cs_primary_input<curve_Fr>& primary_input,
     const r1cs_ppzksnark_proof<curve_pp>& proof
 )
+    const
 {
     if (perform_verification) {
         return r1cs_ppzksnark_online_verifier_strong_IC<curve_pp>(pvk, primary_input, proof);
