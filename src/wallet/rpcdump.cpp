@@ -129,8 +129,9 @@ Value importprivkey(const Array& params, bool fHelp)
         pwalletMain->SetAddressBook(vchAddress, strLabel, "receive");
 
         // Don't throw error in case a key is already there
-        if (pwalletMain->HaveKey(vchAddress))
-            return Value::null;
+        if (pwalletMain->HaveKey(vchAddress)) {
+            return CBitcoinAddress(vchAddress).ToString();
+        }
 
         pwalletMain->mapKeyMetadata[vchAddress].nCreateTime = 1;
 
@@ -145,7 +146,7 @@ Value importprivkey(const Array& params, bool fHelp)
         }
     }
 
-    return Value::null;
+    return CBitcoinAddress(vchAddress).ToString();
 }
 
 Value importaddress(const Array& params, bool fHelp)
