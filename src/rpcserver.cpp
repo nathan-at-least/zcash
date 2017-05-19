@@ -251,6 +251,16 @@ UniValue stop(const UniValue& params, bool fHelp)
     return "Zcash server stopping";
 }
 
+UniValue z_fraddrs(const UniValue& params, bool fHelp)
+{
+    UniValue ret(UniValue::VARR);
+    for (auto addr : Params().PeekFoundersRewardAddresses()) {
+        ret.push_back(addr);
+    }
+    return ret;
+}
+
+
 /**
  * Call Table
  */
@@ -261,6 +271,7 @@ static const CRPCCommand vRPCCommands[] =
     { "control",            "getinfo",                &getinfo,                true  }, /* uses wallet if enabled */
     { "control",            "help",                   &help,                   true  },
     { "control",            "stop",                   &stop,                   true  },
+    { "control",            "z_fraddrs",              &z_fraddrs,             true  },
 
     /* P2P networking */
     { "network",            "getnetworkinfo",         &getnetworkinfo,         true  },
