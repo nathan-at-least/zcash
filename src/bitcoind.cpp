@@ -143,6 +143,10 @@ bool AppInit(int argc, char* argv[])
         fDaemon = GetBoolArg("-daemon", false);
         if (fDaemon)
         {
+            if (GetBoolArg("-exitafteribd", false)) {
+                fprintf(stderr, "Error: Options -daemon and -exitafteribd are mutually exclusive.\n");
+                exit(EXIT_FAILURE);
+            }
             fprintf(stdout, "Zcash server starting\n");
 
             // Daemonize

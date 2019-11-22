@@ -1907,6 +1907,10 @@ bool IsInitialBlockDownload(const CChainParams& chainParams)
         return true;
     LogPrintf("Leaving InitialBlockDownload (latching to false)\n");
     latchToFalse.store(true, std::memory_order_relaxed);
+    if (GetBoolArg("-exitafteribd", false)) {
+        LogPrintf("Starting shutdown due to -exitafteribd option.\n");
+        StartShutdown();
+    }
     return false;
 }
 
