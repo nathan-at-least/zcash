@@ -1,2 +1,2 @@
 set -efuxo pipefail
-env
+set
