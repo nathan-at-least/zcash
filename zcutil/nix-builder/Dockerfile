@@ -1,11 +1,27 @@
-FROM nixos/nix@sha256:2da921898aa6c89e2e60b1fb72d74525b8464b47412482c7f1cf77b8e707a099
+FROM debian:stable@sha256:55dbe60bf1779a4bb168c1b7cd40cac26a6d8ee369425e265fe2f1c8e99b9317
 
-ENV ZCASH_CHANNEL_REVISION="b58ada326aa612ea1e2fb9a53d550999e94f1985" \
-    ZCASH_SRC="/usr/local/src/zcash" \
-    ZCASH_NIX_BUILDER="${ZCASH_SRC}/zcutil/nix-builder" \
-    ZCASH_NIX_EXPRS="${ZCASH_NIX_BUILDER}/nix"
+ENV ZC_NIX_BUILDER_BOOTSTRAP '/usr/local/share/zcash-nix-builder/bootstrap'
 
-COPY ./zcutil/nix-builder/nix "$ZCASH_NIX_EXPRS"
-RUN nix-build --show-trace "${ZCASH_NIX_EXPRS}/zcash-deps.nix"
+ENV ZC_NIX_BUILDER_PHASE_0 "${ZC_NIX_BUILDER_BOOTSTRAP}/phase0-user-config.sh"
+COPY ./zcutil/nix-builder/bootstrap/phase0-user-config.sh "$ZC_NIX_BUILDER_PHASE_0"
+RUN "$ZC_NIX_BUILDER_PHASE_0"
 
-# Next step: copy the build artifacts out somehow.
+ENV ZC_NIX_BUILDER_PHASE_1 "${ZC_NIX_BUILDER_BOOTSTRAP}/phase1-install-debs.sh"
+COPY ./zcutil/nix-builder/bootstrap/phase1-install-debs.sh "$ZC_NIX_BUILDER_PHASE_1"
+RUN "$ZC_NIX_BUILDER_PHASE_1"
+
+# Set USER manually; nix requires it & docker doesn't use `login`:
+ENV USER nixbuilder
+USER $USER
+SHELL ["/bin/bash", "-c"]
+
+ENV ZC_NIX_BUILDER_PHASE_2 "${ZC_NIX_BUILDER_BOOTSTRAP}/phase2-install-nix.sh"
+COPY ./zcutil/nix-builder/bootstrap/phase2-install-nix.sh "$ZC_NIX_BUILDER_PHASE_2"
+RUN "$ZC_NIX_BUILDER_PHASE_2"
+
+ENV BASH_ENV /home/nixbuilder/.nix-profile/etc/profile.d/nix.sh
+
+COPY . /usr/local/src/zcash
+RUN nix-build --show-trace '/usr/local/src/zcash/zcutil/nix-builder/nix/zcash-deps.nix'
+
+# TODO: verify the build artifacts are bytewise-reproducible then copy the build artifacts out somehow.
