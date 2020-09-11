@@ -7,4 +7,6 @@ pkgs.stdenv.mkDerivation {
 
   src = ./../..;
   builder = ./zcashd-builder.sh;
+
+  buildInputs = with pkgs; [curl];
 }
