@@ -1,12 +1,19 @@
-{
-  pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs-channels/archive/b58ada326aa612ea1e2fb9a53d550999e94f1985.tar.gz") {}
-}:
-pkgs.stdenv.mkDerivation {
-  pname = "zcashd";
-  version = "FIXME";
+let
+  # channelrev taken from https://status.nixos.org/ for nixos-20.09
+  channelrev = "61525137fd1002f6f2a5eb0ea27d480713362cd5";
 
-  src = ./../..;
-  builder = ./zcashd-builder.sh;
+  channelurl = "https://github.com/NixOS/nixpkgs-channels/archive/${channelrev}.tar.gz";
 
-  buildInputs = with pkgs; [curl];
-}
+in
+  { pkgs ? import (fetchTarball channelurl) {} }:
+    pkgs.stdenv.mkDerivation {
+      pname = "zcashd";
+      version = "FIXME";
+
+      src = ./../..;
+      builder = ./zcashd-builder.sh;
+
+      buildInputs = [
+        pkgs.curl
+      ];
+    }
