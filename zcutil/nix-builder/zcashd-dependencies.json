@@ -152,7 +152,7 @@
   {
     "package": "googletest",
     "sha256": "58a6f4277ca2bc8565222b3bbd58a177609e9c488e8a72649359ba51450db7d8",
-    "url": "https://github.com/google/googletest/archive/googletest-1.8.0.tar.gz",
+    "url": "https://github.com/google/googletest/archive/release-1.8.0.tar.gz",
     "version": "1.8.0"
   },
   {
@@ -482,7 +482,7 @@
   {
     "package": "libevent",
     "sha256": "316ddb401745ac5d222d7c529ef1eada12f58f6376a66c1118eee803cb70f83d",
-    "url": "https://github.com/libevent/libevent/archive/libevent-2.1.8.tar.gz",
+    "url": "https://github.com/libevent/libevent/archive/release-2.1.8-stable.tar.gz",
     "version": "2.1.8"
   },
   {
@@ -620,7 +620,7 @@
   {
     "package": "utfcpp",
     "sha256": "ab531c3fd5d275150430bfaca01d7d15e017a188183be932322f2f651506b096",
-    "url": "https://github.com/nemtrif/utfcpp/archive/utfcpp-3.1.tar.gz",
+    "url": "https://github.com/nemtrif/utfcpp/archive/v3.1.tar.gz",
     "version": "3.1"
   },
   {
