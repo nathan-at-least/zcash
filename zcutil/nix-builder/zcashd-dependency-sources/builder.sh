@@ -2,9 +2,14 @@ set -efuo pipefail
 
 source "$stdenv/setup"
 
-mkdir "$out"
+mkdir -p "$out/download-stamps"
+cd "$out"
 for input in $inputs
 do
-    fname="$(basename "$input" | sed 's/^[^-]*-//')"
-    ln -sv "$input" "$out/$fname"
+    # fullname contains package and tarball name:
+    fullname="$(basename "$input" | sed 's/^[^-]*-//')"
+    # tarball name only:
+    tarname="$(echo "$fullname" | sed 's/^[^-]*-//')"
+    ln -s "$input" "$tarname"
+    sha256sum "$tarname" > "./download-stamps/.stamp_fetched-${fullname}.hash"
 done

@@ -1,9 +1,16 @@
+with (import ./../pkgs-pinned.nix);
 let
-  pkgs = import ./../pkgs-pinned.nix;
-  deps = pkgs.lib.trivial.importJSON ./urls.json;
-  fetchdep = dep: pkgs.fetchurl { inherit (dep) url sha256; };
+  deps = lib.trivial.importJSON ./urls.json;
+  fetchdep = {package, sha256, url, version}: fetchurl {
+    inherit url sha256;
+    name =
+      let
+        components = lib.strings.splitString "/" url;
+        filename = lib.last components;
+      in "${package}-${filename}";
+  };
 in
-  pkgs.stdenv.mkDerivation {
+  stdenv.mkDerivation {
     name = "zcashd-dependency-sources";
     inputs = (map fetchdep deps);
     builder = ./builder.sh;
