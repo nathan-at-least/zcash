@@ -1,6 +1,7 @@
 set -efuo pipefail
 
 source "$stdenv/setup"
+# trap 'set +x; exitHandler' EXIT; set -x
 
 mkdir -p "$out/download-stamps"
 cd "$out"

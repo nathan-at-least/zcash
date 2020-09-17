@@ -1,13 +1,9 @@
 with (import ./../pkgs-pinned.nix);
 let
   deps = lib.trivial.importJSON ./urls.json;
-  fetchdep = {package, sha256, url, version}: fetchurl {
+  fetchdep = {package, version, filename, url, sha256}: fetchurl {
     inherit url sha256;
-    name =
-      let
-        components = lib.strings.splitString "/" url;
-        filename = lib.last components;
-      in "${package}-${filename}";
+    name = "${package}-${filename}";
   };
 in
   stdenv.mkDerivation {
