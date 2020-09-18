@@ -1,4 +1,4 @@
-with (import ./../pkgs-pinned.nix);
+with (import ./../../pkgs-pinned.nix);
 let
   deps = lib.trivial.importJSON ./urls.json;
   forEach = lib.lists.forEach;

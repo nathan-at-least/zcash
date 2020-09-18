@@ -1,6 +1,6 @@
 let
   pkgs = import ./../pkgs-pinned.nix;
-  zcdepsrc = import ./../zcashd-dependency-sources;
+  zcdepsrc = import ./dependency-sources;
 in
   with pkgs;
   stdenv.mkDerivation {
