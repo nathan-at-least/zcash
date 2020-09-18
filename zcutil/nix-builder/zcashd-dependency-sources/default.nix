@@ -25,11 +25,16 @@ in
                 inherit url sha256;
                 name = "${package}-${fname}";
               })
-              (writeTextFile {
-                name = "${package}-${fname}-stamp_extras";
-                text = stamp_extras;
-              })
-            ];
+            ] ++ (
+                if stamp_extras == null
+                then [] # specific case for native_cctools
+                else [
+                  (writeTextFile {
+                    name = "${package}-${fname}-stamp_extras";
+                    text = stamp_extras;
+                  })
+                ]
+            );
           }
         );
       }

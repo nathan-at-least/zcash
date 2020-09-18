@@ -12,9 +12,6 @@ SKIP = [
     # Not packages:
     'packages.mk',
     'vendorcrate.mk',
-
-    # Todo: create OVERRIDE:
-    'native_cctools.mk',
 ]
 
 OVERRIDES = {
@@ -31,6 +28,26 @@ OVERRIDES = {
             'url': 'https://static.rust-lang.org/dist/rust-std-1.42.0-x86_64-pc-windows-gnu.tar.gz',
             'sha256': '8a8389f3860df6f42fbf8b76a62ddc7b9b6fe6d0fb526dcfc42faab1005bfb6d',
             'stamp_extras': ['rust-1.42.0-x86_64-unknown-linux-gnu.tar.gz'],
+        }],
+    },
+    'native_cctools.mk': {
+        'package': 'native_cctools',
+        'archives': [{
+            'url': 'https://github.com/tpoechtrager/cctools-port/archive/55562e4073dea0fbfd0b20e0bf69ffe6390c7f97.tar.gz',
+            'sha256': 'e51995a843533a3dac155dd0c71362dd471597a2d23f13dff194c6285362f875',
+            'stamp_extras': [
+                'clang-llvm-8.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz',
+                '3efb201881e7a76a21e0554906cf306432539cef.tar.gz',
+            ],
+        }, {
+            'filename': 'clang-llvm-8.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz',
+            'url': 'https://releases.llvm.org/8.0.0/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz',
+            'sha256': '9ef854b71949f825362a119bf2597f744836cb571131ae6b721cd102ffea8cd0',
+            'stamp_extras': None,
+        }, {
+            'url': 'https://github.com/tpoechtrager/apple-libtapi/archive/3efb201881e7a76a21e0554906cf306432539cef.tar.gz',
+            'sha256': '380c1ca37cfa04a8699d0887a8d3ee1ad27f3d08baba78887c73b09485c0fbd3',
+            'stamp_extras': None,
         }],
     },
 }
