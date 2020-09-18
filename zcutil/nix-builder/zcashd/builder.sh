@@ -1,9 +1,18 @@
+source "$stdenv/setup"
 set -efuo pipefail
 
-source "$stdenv/setup"
-trap 'set +x; exitHandler' EXIT
-set -x
+# Override tar w/ our hash-bang patcher:
+patcherbin="$(pwd)/hashbang-patcher-tar/bin"
+mkdir -p "$patcherbin"
+install --mode 555 "$hashbangPatcherTar" "$patcherbin/tar"
+patchShebangs --build "$patcherbin"
+export PATH="$patcherbin:$PATH"
+type tar
 
+tar --help
+exit 1
+
+set -x
 make -C \
     "$src/depends" \
     BASEDIR="$out/depends-output" \

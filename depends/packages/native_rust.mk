@@ -35,6 +35,7 @@ $(call fetch_file,$(package),$($(package)_download_path),$($(package)_file_name_
 endef
 
 define $(package)_extract_cmds
+  set -x; \
   mkdir -p $($(package)_extract_dir) && \
   echo "$($(package)_sha256_hash)  $($(package)_source)" > $($(package)_extract_dir)/.$($(package)_file_name).hash && \
   echo "$($(package)_sha256_hash_$(build_os))  $($(package)_source_dir)/$($(package)_file_name_$(build_os))" >> $($(package)_extract_dir)/.$($(package)_file_name).hash && \

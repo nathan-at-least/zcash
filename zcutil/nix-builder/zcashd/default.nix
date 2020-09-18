@@ -9,6 +9,13 @@ in
 
     src = ./../../..;
     builder = ./builder.sh;
+    hashbangPatcherTar = ./hashbang-patcher-tar.sh;
+
+    buildInputs = [
+        # These are required at least by openssl:
+        perl
+        coreutils
+    ];
 
     inherit zcdepsrc;
   }
