@@ -13,10 +13,27 @@ SKIP = [
     'packages.mk',
     'vendorcrate.mk',
 
-    # Special case packages:
-    'native_rust.mk',
+    # Todo: create OVERRIDE:
     'native_cctools.mk',
 ]
+
+OVERRIDES = {
+    'native_rust.mk': {
+        'package': 'native_rust',
+        'archives': [{
+            'url': 'https://static.rust-lang.org/dist/rust-1.42.0-x86_64-unknown-linux-gnu.tar.gz',
+            'sha256': '7d1e07ad9c8a33d8d039def7c0a131c5917aa3ea0af3d0cc399c6faf7b789052',
+        }, {
+            'url': 'https://static.rust-lang.org/dist/rust-std-1.42.0-x86_64-apple-darwin.tar.gz',
+            'sha256': '1d61e9ed5d29e1bb4c18e13d551c6d856c73fb8b410053245dc6e0d3b3a0e92c',
+            'stamp_extras': ['rust-1.42.0-x86_64-unknown-linux-gnu.tar.gz'],
+        }, {
+            'url': 'https://static.rust-lang.org/dist/rust-std-1.42.0-x86_64-pc-windows-gnu.tar.gz',
+            'sha256': '8a8389f3860df6f42fbf8b76a62ddc7b9b6fe6d0fb526dcfc42faab1005bfb6d',
+            'stamp_extras': ['rust-1.42.0-x86_64-unknown-linux-gnu.tar.gz'],
+        }],
+    },
+}
 
 def main():
     result = []
@@ -29,14 +46,21 @@ def main():
 
         #info(f'Parsing: {p}')
         try:
-            pkginfos = extract_source_info(p)
+            pkginfo = get_source_info(p)
         except Exception as e:
             warn(f'Skipping {p}: {e}')
             raise
         else:
-            result.extend(pkginfos)
+            result.append(pkginfo)
 
     json.dump(result, sys.stdout, indent=2, sort_keys=True)
+
+
+def get_source_info(path):
+    try:
+        return OVERRIDES[path.name]
+    except KeyError:
+        return extract_source_info(path)
 
 
 def extract_source_info(path):
@@ -65,13 +89,16 @@ def extract_source_info(path):
         e.args += (f'Found url for {platform!r} but no sha256 hash.',)
         raise
     else:
-        found = True
-        yield {
-            'package': f'{package}',
-            'version': version,
-            'filename': filename,
+        urlentry = {
             'url': f'{urlbase}/{urlfile}',
             'sha256': sha256,
+        }
+        if filename != urlfile:
+            urlentry['filename'] = filename
+
+        return {
+            'package': f'{package}',
+            'archives': [urlentry],
         }
 
 
